@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+var yargs = require('yargs');
+
+
+/* help */
+yargs = require(__dirname + '/modules/help.js')(yargs);
+
+/* version */
+yargs = require(__dirname + '/modules/version.js')(yargs);
+
+/* mksec */
+yargs = require(__dirname + '/modules/mksec.js')(yargs);
+
+argv = yargs.epilogue("-----------------------").argv;
