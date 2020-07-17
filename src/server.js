@@ -12,7 +12,7 @@ data_folder = __dirname+'/data/'
 app.listen(port, () => console.log(`mksec-server listening at http://localhost:${port}`));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(require('express').static('public'));
+app.use(require('express').static(__dirname+'/public'));
 
 app.get('/mksec/', async (req, res) => {
 

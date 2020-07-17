@@ -2,6 +2,10 @@ module.exports = (yargs) => {
 	var o = {
 		push: (arr) => {
 			let ban = ora(`Pushing...`).start();
+            if(!data.config.email()){
+                ban.fail('Empty Email!! Please use   mksec config -e [email]   first!!');
+                return;
+            }
 			request.post(data.config.remote(), {
 				form:{
 					action: 'push',
