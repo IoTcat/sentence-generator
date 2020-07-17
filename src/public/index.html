@@ -156,8 +156,12 @@ data = [];
 
 
 iter = 0;
+sentence = '';
 var next = function(){
   $.get('./mksec/?word='+data[(iter++)%data.length], function(res){
+    sentence = res;
+     let pos = res.indexOf(data[(iter-1)%data.length]);
+    res = res.substring(0, pos) + '<strong>' + String(data[(iter-1)%data.length]) + '</strong>' + res.substring(pos + String(data[(iter-1)%data.length]).length);
     $('#sentence').html(res);
     getInfo();
   })
@@ -184,7 +188,18 @@ var getInfo = function(){
 
 
       $('#no').click(function(){
-          next();
+
+        $.get('./fy/?word='+sentence, function(res){
+          tips.show({
+            title: '',
+            message: res,
+            timeout: res.length * 1000,
+            onClosing: function () {
+              next();
+            }
+          });
+        })
+          
       });
 
 

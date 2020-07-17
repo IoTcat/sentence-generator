@@ -22,14 +22,14 @@ module.exports = () => {
 			type: "object",
 			default: {
 				email: '',
-				remote: "https://mksec.yimian.xyz/publish/"
+				remote: "https://mksec.yimian.xyz"
 			}
 		}
 	});
 
 	if(conf.get('config') == undefined) conf.set('config', {
 		email: '',
-		remote: "https://mksec.yimian.xyz/publish/"
+		remote: "https://mksec.yimian.xyz"
 	});
 
 	return o;
