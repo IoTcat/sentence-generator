@@ -55,11 +55,16 @@ module.exports = yargs => {
                 let arr = (await mksec({word: wArr[index]})); 
                 let sec = arr[Math.floor((Math.random()*arr.length))];
 
-                let res = wArr[index] + '  ' + sec;
+                sec = sec.replace(/’/g, "'");
+                sec = sec.replace(/“/g, '"');
+                sec = sec.replace(/”/g, '"');
+                sec = sec.replace(/\"/g, '""');
+
+                let res = wArr[index] + ',"' + sec + '"';
 
                 o += res + '\n';
 
-                fs.writeFileSync('./mksec.txt', o);
+                fs.writeFileSync(argv._[1]+'.sentences.csv', o);
                 ban.info('Found '+wArr[index]);
             }catch(e){
                 ban.fail('Not found '+wArr[index]);
@@ -67,7 +72,7 @@ module.exports = yargs => {
         }
 
 
-        ban.succeed('Generated '+wArr.length+' sentences in current fold mksec.txt!!');
+        ban.succeed('Generated '+wArr.length+' sentences in '+argv._[1]+'.sentences.csv'+'!!');
         
 	})
 
