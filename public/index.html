@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MkSec Web</title>
+    <link rel="stylesheet" href="css/awsm.min.css">
+    <script type="text/javascript">
+   var version = '3.0.6';
+      var themes = JSON.parse('[{"title":"white","prismTheme":""},{"title":"gondola","prismTheme":"tomorrow"},{"title":"mischka","prismTheme":"okaidia"},{"title":"big-stone","prismTheme":"tomorrow"},{"title":"black","prismTheme":""},{"title":"tasman","prismTheme":""},{"title":"pastel-pink","prismTheme":""},{"title":"pearl-lusta","prismTheme":"solarizedlight"}]');
+      var storedVersion = localStorage.getItem('awsm-version');
+      
+      if (version !== storedVersion) {
+        localStorage.removeItem('awsm-current-theme');
+        localStorage.removeItem('awsm-themes');
+        localStorage.setItem('awsm-version', version);
+      }
+      
+      function getCSSFileName(theme) {
+        return 'css/awsm_theme_' + theme + '.min.css';
+      }
+      
+      function appendStyles(str) {
+        var style = document.createElement('style');
+        style.innerHTML = str;
+        document.querySelector('head').appendChild(style);
+      }
+      
+      function loadTheme() {
+        var theme = localStorage.getItem('awsm-current-theme');
+      
+        if (!theme || theme === 'white') return;
+      
+        reloadTheme(theme);
+      }
+      
+      function reloadTheme(theme) {
+        var storedThemesStr = localStorage.getItem('awsm-themes');
+      
+        if (!storedThemesStr) return;
+      
+        var storedThemes = JSON.parse(storedThemesStr);
+      
+        appendStyles(storedThemes[theme]);
+      }
+      
+      loadTheme();
+    </script>
+    <script type="text/javascript">block_aplayer = true;</script>
+    <script src="https://cdn.yimian.xyz/ushio-js/ushio-head.min.js"></script>
+    <script type="text/javascript">
+      if(!cookie.get('email')){
+        window.location.href='./login.html';
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>MkSec Web</h1>
+      <p>Learn English by sentences~
+      </p>
+      <nav>
+        <ul>
+          
+          
+          <li><a href="https://github.com/iotcat/sentence-generator" target="_blank">GitHub</a></li>
+          <li><a href="https://iotcat.me/" target="_blank">Author</a></li>
+          <li><a href="./logout.html">Logout</a></li>
+          <li>
+            <select id="theme-changer" onchange="updateTheme(this.value)">
+              <option value="white" selected>white</option>
+              <option value="gondola">gondola</option>
+              <option value="mischka">mischka</option>
+              <option value="big-stone">big-stone</option>
+              <option value="black">black</option>
+              <option value="tasman">tasman</option>
+              <option value="pastel-pink">pastel-pink</option>
+              <option value="pearl-lusta">pearl-lusta</option>
+            </select>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <section>
+          <h2><a id="main" href="#sentence" aria-hidden="true"></a>Sentence
+          </h2>
+          <br>
+          <br>
+            <blockquote>
+              <p id="sentence">Loading...</p>
+            </blockquote>
+            <br>
+          <section>
+            <h3>Could you understand this sentence?
+            </h3>
+            <br>
+            <input style="display:inline-block;margin:0 auto" id="no" type="submit" value="No, I don't.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input style="display:inline-block;margin:0 auto" id="yes" type="submit" value="Yes, I do.">
+            <br><br>
+            <aside>
+
+              <p><strong>N.B.</strong> <span id="info"></span></p>
+            </aside>
+          </section>
+        </section>
+      </article>
+    </main>
+    <footer>
+      <p style="text-align: center;"> Powered By Ushio | Made with love by <a href="https://iotcat.me">iotcat</a> </p>
+      <br>
+    </footer>
+    <script>
+ function loadCSS(path, cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', path);
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4 && this.status === 200) {
+            cb(this.responseText);
+          }
+        };
+        xhr.send();
+  }
+ function updateTheme(theme) {
+        localStorage.setItem('awsm-current-theme', theme);
+        loadCSS(getCSSFileName(theme), function(text) {
+          var storedThemesStr = localStorage.getItem('awsm-themes');
+          var storedThemes = JSON.parse(storedThemesStr) || {};
+          storedThemes[theme] = text;
+      
+          localStorage.setItem('awsm-themes', JSON.stringify(storedThemes));
+          reloadTheme(theme);
+        });
+      }
+      
+      var theme = localStorage.getItem('awsm-current-theme');
+      
+      if (theme && theme !== 'white') {
+        document.getElementById('theme-changer').value = theme;
+      }
+    </script>
+    <script src="https://cdn.yimian.xyz/ushio-js/ushio-footer.min.js"></script>
+    <script type="text/javascript">
+
+data = [];
+
+      $.get('./getData/?email='+cookie.get('email'), function(res){
+          if(res.code != 200){
+            alert(res.message);
+          }else{
+            data = res.data;
+            next();
+          }
+      })
+
+
+iter = 0;
+var next = function(){
+  $.get('./mksec/?word='+data[(iter++)%data.length], function(res){
+    $('#sentence').html(res);
+    getInfo();
+  })
+}
+
+var upgrade = function(){
+  $.get('./upgrade/?email='+cookie.get('email')+'&word='+data[(iter-1)%data.length], function(res){
+  if(res.code != 200){
+    alert(res.message);
+  }
+});
+}
+
+
+var getInfo = function(){
+  $.get('./getInfo/?email='+cookie.get('email')+'&word='+data[(iter-1)%data.length], function(res){
+  if(res.code != 200){
+    alert(res.message);
+  }else{
+    $('#info').html('Word: '+data[(iter-1)%data.length]+' | Level: ' + res.data);
+  }
+});
+}
+
+
+      $('#no').click(function(){
+          next();
+      });
+
+
+      $('#yes').click(function(){
+        upgrade();
+        next();
+      });
+
+
+    </script>
+  </body>
+</html>

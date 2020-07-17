@@ -8,6 +8,12 @@ yargs = require(__dirname + '/modules/help.js')(yargs);
 /* version */
 yargs = require(__dirname + '/modules/version.js')(yargs);
 
+/* config */
+yargs = require(__dirname + '/modules/config.js')(yargs);
+
+/* push */
+yargs = require(__dirname + '/modules/push.js')(yargs);
+
 /* mksec */
 yargs = require(__dirname + '/modules/mksec.js')(yargs);
 

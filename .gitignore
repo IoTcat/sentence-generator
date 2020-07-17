@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# test files
+*.csv
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -99,6 +102,9 @@ dist
 
 # DynamoDB Local files
 .dynamodb/
+
+# data files
+data/
 
 # TernJS port file
 .tern-port
