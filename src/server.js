@@ -1,9 +1,9 @@
 const mksec = require(__dirname+'/index.js');
+const fy = require(__dirname+'/fy.js');
 const app = require('express')();
 const md5 = require('md5');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-
 
 port = 3000;
 data_folder = __dirname+'/data/'
@@ -23,6 +23,16 @@ app.get('/mksec/', async (req, res) => {
     res.send(arr[Math.floor((Math.random()*arr.length))]);
 
 });
+
+app.get('/fy/', async (req, res) => {
+
+    let arr = await fy({
+        word: req.query.word
+    });
+    res.send(arr);
+
+});
+
 
 app.post('/publish/', async (req, res) => {
 
