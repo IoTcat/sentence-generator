@@ -13,7 +13,7 @@ module.exports = async (params) => {
 
 
     return new Promise((resolve, reject) => {
-        request(o_params.url+o_params.word, (err, res, body) => {
+        request(o_params.url+encodeURI(o_params.word), (err, res, body) => {
             if(err){
                 reject(err);
             }else{
