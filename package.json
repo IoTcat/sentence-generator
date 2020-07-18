@@ -1,10 +1,6 @@
 {
   "name": "mksec",
-<<<<<<< HEAD
-  "version": "2.2.2",
-=======
   "version": "2.3.0",
->>>>>>> b8883c375128178a5e1a45fe63ca4a45624b9ad5
   "main": "src/index.js",
   "repository": "git@github.com:IoTcat/sentence-generator.git",
   "author": "iotcat <i@iotcat.me>",
