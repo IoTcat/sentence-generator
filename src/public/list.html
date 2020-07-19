@@ -64,7 +64,8 @@
         <ul>
           
           
-          <li><a href="./list.html">List</a></li>
+          
+          <li><a href="./index.html">Home</a></li>
           <li><a href="./upload.html">Upload</a></li>
           <li><a href="./logout.html">Logout</a></li>
           <li><a href="https://github.com/iotcat/sentence-generator" target="_blank">GitHub</a></li>
@@ -86,25 +87,18 @@
     <main>
       <article>
         <section>
-          <h2><a id="main" href="#sentence" aria-hidden="true"></a>Sentence
+          <h2><a id="main" href="#sentence" aria-hidden="true"></a>Word List
           </h2>
           <br>
           <br>
-            <blockquote>
-              <p id="sentence">Loading...</p>
-            </blockquote>
-            <br>
-          <section>
-            <h3>Could you understand this sentence?
-            </h3>
-            <br>
-            <input style="display:inline-block;margin:0 auto" id="no" type="submit" value="No, I don't.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input style="display:inline-block;margin:0 auto" id="yes" type="submit" value="Yes, I do.">
-            <br><br>
-            <aside>
-
-              <p><strong>N.B.</strong> <span id="info"></span></p>
-            </aside>
-          </section>
+          <div id="box">
+          <details>
+            <summary>Level</summary>
+            <ul>
+              <li></li>
+            </ul>
+          </details>
+        </div>
         </section>
       </article>
     </main>
@@ -162,9 +156,9 @@ sentence = '';
 
 var sort = function(){
 
-  data = data.sort(function(){Math.random() - 0.5});
+  //data = data.sort(function(){Math.random() - 0.5});
   data = data.sort(function(o1, o2){
-    return (o1['level'] - o2['level'])+Math.random() - 0.5;
+    return (o1['level'] - o2['level']);//+Math.random() - 0.5;
   });  
 
 }
@@ -184,24 +178,53 @@ var addProperty = function(s, word, before, after){
 
 var next = function(){
   sort();
-  $.get('./mksec/?word='+data[0].word, function(res){
-    sentence = res;
-    let arr = res.match(/\b[a-zA-Z]+\b/g);
-    arr = [...new Set(arr)];
-    iter = 0;
 
-    for(let i = 0; i < arr.length; i ++){
-      if(arr[i].indexOf(data[0].word)!=-1 || (data[0].word.length > 5 && arr[i].indexOf(data[0].word.substr(0, data[0].word.length - 1))!= -1) || (data[0].word.length > 6 && arr[i].indexOf(data[0].word.substr(0, data[0].word.length - 2))!= -1)){
-        res = addProperty(res, arr[i], '<strong>', '</strong>');
-      }else{
-        res = addProperty(res, arr[i], '<span class="oword">', '</span>');
+  let levelArr = [];
+  for(item in data){
+    levelArr.push(data[item].level);
+  }
+
+  levelArr = [...new Set(levelArr)];
+  levelArr.sort((a, b) => a-b);console.log(levelArr)
+
+
+
+
+  let s = '';
+
+
+
+
+
+
+  for(level in levelArr){
+
+
+    let arr = [];
+    for(item in data){
+      if(data[item].level == levelArr[level]){
+        arr.push(data[item].word);
       }
     }
 
-    
-    $('#sentence').html(res);
-    getInfo();
-  })
+    arr.sort();
+    s += '<details>'
+    s += '<summary> Level ' + levelArr[level] + ' ('+arr.length+')</summary>'
+    s+= '<ul>'
+
+
+
+    for(word in arr){
+      s+= '<li><span class="oword">' +arr[word]+ '</span></li>'
+    }
+
+    s+= '</ul>'
+    s+='</details>'
+  }
+
+
+  $('#box').html(s);
+
 }
 
 var upgrade = function(){
@@ -219,40 +242,10 @@ var getInfo = function(){
   if(res.code != 200){
     alert(res.message);
   }else{
-    let arr = [];
-    for(item in data){
-      if(data[item].level == res.data){
-        arr.push(data[item].word);
-      }
-    }
-
-    arr.sort();
-    $('#info').html('Word: '+data[0].word+' | Level: ' + res.data + ' | Remains: ' + arr.length);
+    $('#info').html('Word: '+data[0].word+' | Level: ' + res.data);
   }
 });
 }
-
-
-      $('#no').click(function(){
-
-        $.get('./fy/?word='+sentence, function(res){
-          tips.show({
-            title: '',
-            message: res,
-            timeout: res.length * 1000,
-            onClosing: function () {
-              next();
-            }
-          });
-        })
-          
-      });
-
-
-      $('#yes').click(function(){
-        upgrade();
-        next();
-      });
 
 
 

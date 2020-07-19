@@ -25,7 +25,7 @@ module.exports = async (params) => {
                         reject();
                     }
                     data.result.sentences.forEach((item, index) => {
-                        o.push(item.sentence);
+                        o.push(item.sentence+'   --'+item.volume.corpus.name);
                         if(index == data.result.sentences.length - 1){
                             resolve(o);
                         }
