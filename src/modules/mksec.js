@@ -76,6 +76,30 @@ module.exports = yargs => {
         
 	})
 
+	.command('r', "mksec r".green + " Check word list file with random order..", yargs => yargs, async argv => {
+
+        let s = fs.readFileSync(argv._[1], 'utf-8');
+        let wArr = s.match(/\b[a-zA-Z]+\b/g);
+        wArr = wArr.sort(()=>Math.random() - 0.5);
+        let count = 0;
+        for(let index = 0; index < wArr.length; index ++){
+            wArr[index] = wArr[index].toLowerCase();
+            ban = new ora(`Searching ${wArr[index]}...`).start();
+            try{
+                let arr = (await mksec({word: wArr[index]})); 
+
+                count++;
+                ban.info('Found '+wArr[index]);
+            }catch(e){
+                ban.fail('Not found '+wArr[index]);
+            }
+        }
+
+
+        ban.succeed('Found '+wArr.length+' words, verified '+ count +' words.');
+        
+	})
+
 
 
 
