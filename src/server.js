@@ -107,7 +107,7 @@ app.get('/getData/', async (req, res) => {
         res.send({
             code: 200,
             message: 'Get data successfully!',
-            data: arr
+            data: (req.query.hasOwnProperty('type') && req.query.type == 'obj')?data : arr
         });
 
         return;

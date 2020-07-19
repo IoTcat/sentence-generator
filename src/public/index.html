@@ -145,7 +145,7 @@
 
 data = [];
 
-      $.get('./getData/?email='+cookie.get('email'), function(res){
+      $.get('./getData/?type=obj&email='+cookie.get('email'), function(res){
           if(res.code != 200){
             alert(res.message);
           }else{
@@ -157,18 +157,30 @@ data = [];
 
 iter = 0;
 sentence = '';
+
+var sort = function(){
+
+  data = data.sort(function(){Math.random() - 0.5});
+  data = data.sort(function(o1, o2){
+    return (o1['level'] - o2['level'])+Math.random() - 0.5;
+  });  
+
+}
+
 var next = function(){
-  $.get('./mksec/?word='+data[(iter++)%data.length], function(res){
+  sort();
+  $.get('./mksec/?word='+data[0].word, function(res){
     sentence = res;
-     let pos = res.indexOf(data[(iter-1)%data.length]);
-    res = res.substring(0, pos) + '<strong>' + String(data[(iter-1)%data.length]) + '</strong>' + res.substring(pos + String(data[(iter-1)%data.length]).length);
+     let pos = res.indexOf(data[0].word);
+    res = res.substring(0, pos) + '<strong>' + String(data[0].word) + '</strong>' + res.substring(pos + String(data[0].word).length);
     $('#sentence').html(res);
     getInfo();
   })
 }
 
 var upgrade = function(){
-  $.get('./upgrade/?email='+cookie.get('email')+'&word='+data[(iter-1)%data.length], function(res){
+  data[0].level++;
+  $.get('./upgrade/?email='+cookie.get('email')+'&word='+data[0].word, function(res){
   if(res.code != 200){
     alert(res.message);
   }
@@ -177,11 +189,11 @@ var upgrade = function(){
 
 
 var getInfo = function(){
-  $.get('./getInfo/?email='+cookie.get('email')+'&word='+data[(iter-1)%data.length], function(res){
+  $.get('./getInfo/?email='+cookie.get('email')+'&word='+data[0].word, function(res){
   if(res.code != 200){
     alert(res.message);
   }else{
-    $('#info').html('Word: '+data[(iter-1)%data.length]+' | Level: ' + res.data);
+    $('#info').html('Word: '+data[0].word+' | Level: ' + res.data);
   }
 });
 }
