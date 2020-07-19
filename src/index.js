@@ -21,6 +21,9 @@ module.exports = async (params) => {
 
                     let data = JSON.parse(res.body);
                     let o = [];
+                    if(!data.result.totalHits){
+                        reject();
+                    }
                     data.result.sentences.forEach((item, index) => {
                         o.push(item.sentence);
                         if(index == data.result.sentences.length - 1){

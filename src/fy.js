@@ -2,7 +2,8 @@ module.exports = async (params) => {
 
     var o_params = {
         word: 'home',
-        url: 'https://fy.iciba.com/ajax.php?a=fy&f=en&t=zh&w='
+        url: 'https://fy.iciba.com/ajax.php?a=fy&f=en&t=zh&w=',
+        type: 'sentence'
     }
 
     Object.assign(o_params, params);
@@ -18,9 +19,22 @@ module.exports = async (params) => {
                 reject(err);
             }else{
                 try{
-
                     let data = JSON.parse(res.body);
-                    resolve(data.content.out);
+                    if(o_params.type == 'word'){
+                        if(data.content.hasOwnProperty('word_mean')){
+                            resolve(data.content.word_mean);
+                        }else{
+                            reject();
+                        }
+                    }else{
+                        if(data.content.hasOwnProperty('out')){
+                            resolve(data.content.out);
+                        }else if(data.content.hasOwnProperty('word_mean')){
+                            resolve(data.content.word_mean);
+                        }else{
+                            reject();
+                        }
+                    }
                 }catch(e){
                     reject(e);
                 }

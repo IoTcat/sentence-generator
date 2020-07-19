@@ -66,7 +66,7 @@
           
           <li><a href="https://github.com/iotcat/sentence-generator" target="_blank">GitHub</a></li>
           <li><a href="https://iotcat.me/" target="_blank">Author</a></li>
-          <li><a href="./upload.html">Upload</a></li>
+          <li><a href="./index.html">Home</a></li>
           <li><a href="./logout.html">Logout</a></li>
           <li>
             <select id="theme-changer" onchange="updateTheme(this.value)">
@@ -85,26 +85,17 @@
     </header>
     <main>
       <article>
-        <section>
-          <h2><a id="main" href="#sentence" aria-hidden="true"></a>Sentence
+<section>
+          <h2><a id="forms" href="#forms" aria-hidden="true"></a>Upload
           </h2>
-          <br>
-          <br>
-            <blockquote>
-              <p id="sentence">Loading...</p>
-            </blockquote>
-            <br>
-          <section>
-            <h3>Could you understand this sentence?
-            </h3>
-            <br>
-            <input style="display:inline-block;margin:0 auto" id="no" type="submit" value="No, I don't.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input style="display:inline-block;margin:0 auto" id="yes" type="submit" value="Yes, I do.">
-            <br><br>
-            <aside>
-
-              <p><strong>N.B.</strong> <span id="info"></span></p>
-            </aside>
-          </section>
+          <form onsubmit="upload(); return false;">
+            <fieldset>
+              <legend>Box</legend>
+              <label for="word-list">Copy your words here, separated by comma, space or line feed.</label>
+              <textarea id="word-list"></textarea>
+              <input type="submit" value="Submit">
+            </fieldset>
+          </form>
         </section>
       </article>
     </main>
@@ -143,123 +134,54 @@
     </script>
     <script src="https://cdn.yimian.xyz/ushio-js/ushio-footer.min.js"></script>
     <script type="text/javascript">
+      var upload = async function(){
+        let o = [];
+        let wArr = $('#word-list').val().match(/\b[a-zA-Z]+\b/g);
+        for(let index = 0; index < wArr.length; index ++){
+           wArr[index] = wArr[index].toLowerCase();
+           try{
+              let arr = (await mksec(wArr[index]));
+              o.push(wArr[index]);
+              tips.info({
+                message: 'Found '+ wArr[index]
+              });
+           }catch(e){
+              tips.warning({
+                message: 'Not found '+ wArr[index]
+              });
+           }
+        }
 
-data = [];
-
-      $.get('./getData/?type=obj&email='+cookie.get('email'), function(res){
-          if(res.code != 200){
-            alert(res.message);
-            window.location.href='./upload.html';
+        $.post('./publish/', {
+          email: cookie.get('email'),
+          data: JSON.stringify(o)
+        }, function(res){
+          if(res.code == 200){
+            tips.success({
+              message: res.message
+            });
           }else{
-            data = res.data;
-            next();
+            tips.error({
+              message: res.message
+            });
           }
-      })
+        });
 
-
-iter = 0;
-sentence = '';
-
-var sort = function(){
-
-  data = data.sort(function(){Math.random() - 0.5});
-  data = data.sort(function(o1, o2){
-    return (o1['level'] - o2['level'])+Math.random() - 0.5;
-  });  
-
-}
-
-var addProperty = function(s, word, before, after){
-
-  let pos = s.indexOf(word, iter);
-
-  if(before.indexOf(word) == -1 && after.indexOf(word) == -1 && '<span class="oWord"></span><strong></strong>'.indexOf(word) == -1){
-    iter = pos + String(word).length + after.length;
-    return s.substring(0, pos) + before + String(word) + after + s.substring(pos + String(word).length);
-  }
-  else
-    return s;
-}
-
-
-var next = function(){
-  sort();
-  $.get('./mksec/?word='+data[0].word, function(res){
-    sentence = res;
-    let arr = res.match(/\b[a-zA-Z]+\b/g);
-    arr = [...new Set(arr)];
-    iter = 0;
-
-    for(let i = 0; i < arr.length; i ++){
-      if(arr[i].indexOf(data[0].word)!=-1 || (data[0].word.length > 5 && arr[i].indexOf(data[0].word.substr(0, data[0].word.length - 1))!= -1) || (data[0].word.length > 6 && arr[i].indexOf(data[0].word.substr(0, data[0].word.length - 2))!= -1)){
-        res = addProperty(res, arr[i], '<strong>', '</strong>');
-      }else{
-        res = addProperty(res, arr[i], '<span class="oword">', '</span>');
       }
+
+
+
+    var mksec = (word) => {
+      return new Promise((resolve, reject) => {
+        $.get('./mksec/?word='+word)
+        .done(function(res){
+          resolve(res);
+        })
+        .fail(function(){
+          reject();
+        })
+      })
     }
-
-    
-    $('#sentence').html(res);
-    getInfo();
-  })
-}
-
-var upgrade = function(){
-  data[0].level++;
-  $.get('./upgrade/?email='+cookie.get('email')+'&word='+data[0].word, function(res){
-  if(res.code != 200){
-    alert(res.message);
-  }
-});
-}
-
-
-var getInfo = function(){
-  $.get('./getInfo/?email='+cookie.get('email')+'&word='+data[0].word, function(res){
-  if(res.code != 200){
-    alert(res.message);
-  }else{
-    $('#info').html('Word: '+data[0].word+' | Level: ' + res.data);
-  }
-});
-}
-
-
-      $('#no').click(function(){
-
-        $.get('./fy/?word='+sentence, function(res){
-          tips.show({
-            title: '',
-            message: res,
-            timeout: res.length * 1000,
-            onClosing: function () {
-              next();
-            }
-          });
-        })
-          
-      });
-
-
-      $('#yes').click(function(){
-        upgrade();
-        next();
-      });
-
-
-
-      $('body').on('click','.oword',function(){
-
-        let word = $(this).html();
-        $.get('./fy/?type=word&word='+word, function(res){
-          tips.info({
-            title: word,
-            message: res
-          });
-        })
-      });
-
-
     </script>
   </body>
 </html>

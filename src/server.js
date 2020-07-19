@@ -16,20 +16,32 @@ app.use(require('express').static(__dirname+'/public'));
 
 app.get('/mksec/', async (req, res) => {
 
+try{
     let arr = await mksec({
         word: req.query.word
     });
 
     res.send(arr[Math.floor((Math.random()*arr.length))]);
+}catch(e){
+    res.status(404).send('No such word or sentences!!');
+}
 
 });
 
 app.get('/fy/', async (req, res) => {
 
+try{
     let arr = await fy({
-        word: req.query.word
+        word: req.query.word,
+        type: (req.query.hasOwnProperty('type') && req.query.type == 'word') ? 'word' : 'sentence'
     });
     res.send(arr);
+}catch(e){
+    res.status(404).send({
+        code: 404,
+        message: 'No such word or sentences!!'
+    });
+}
 
 });
 
