@@ -5,6 +5,7 @@ module.exports = yargs => {
 	const table = require('cli-table');
     const ora = require('ora');
 	const mksec = require(__dirname+'/../index.js');
+	const fy = require(__dirname+'/../fy.js');
     const fs = require('fs');
 
 	yargs = yargs
@@ -76,7 +77,7 @@ module.exports = yargs => {
         
 	})
 
-	.command('r', "mksec r".green + " Check word list file with random order..", yargs => yargs, async argv => {
+	.command('r', "mksec r".green + " Check word list file in random order..", yargs => yargs, async argv => {
 
         let s = fs.readFileSync(argv._[1], 'utf-8');
         let wArr = s.match(/\b[a-zA-Z]+\b/g);
@@ -100,6 +101,35 @@ module.exports = yargs => {
         
 	})
 
+
+
+	.command('rf', "mksec rf".green + " Check word list file with translation in random order..", yargs => yargs, async argv => {
+
+        let s = fs.readFileSync(argv._[1], 'utf-8');
+        let wArr = s.match(/\b[a-zA-Z]+\b/g);
+        wArr = wArr.sort(()=>Math.random() - 0.5);
+        let count = 0;
+        for(let index = 0; index < wArr.length; index ++){
+            wArr[index] = wArr[index].toLowerCase();
+            ban = new ora(`Searching ${wArr[index]}...`).start();
+            try{
+                let arr = (await mksec({word: wArr[index]})); 
+                let fys = (await fy({word: wArr[index], type: 'word'}));
+                count++;
+                let sp = '';
+                for(let i = 0; i < 40-wArr[index].length; i++){
+                    sp += ' ';
+                }
+                ban.info('Found '+wArr[index] + sp + fys);
+            }catch(e){
+                ban.fail('Not found '+wArr[index]);
+            }
+        }
+
+
+        ban.succeed('Found '+wArr.length+' words, verified '+ count +' words.');
+        
+	})
 
 
 
