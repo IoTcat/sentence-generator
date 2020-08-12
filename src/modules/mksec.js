@@ -103,6 +103,7 @@ module.exports = yargs => {
 
 
 
+
 	.command('rf', "mksec rf".green + " Check word list file with translation in random order..", yargs => yargs, async argv => {
 
         let s = fs.readFileSync(argv._[1], 'utf-8');
@@ -132,7 +133,39 @@ module.exports = yargs => {
 	})
 
 
+	.command('rg', "mksec rg".green + " Check GRE word list file with translation in random order..", yargs => yargs, async argv => {
 
+        let s = fs.readFileSync(argv._[1], 'utf-8');
+        let wArr = s.match(/[^\r\n]+/g);
+        s = fs.readFileSync(argv._[2], 'utf-8');
+        let fArr = s.match(/[^\r\n]+/g);
+        let cntArr = [];
+        for(let i = 0; i < wArr.length; i++){
+            cntArr.push(i);
+        }
+        cntArr = cntArr.sort(()=>Math.random() - 0.5);
+        let count = 0;
+        for(let index = 0; index < cntArr.length; index ++){
+            wArr[cntArr[index]] = wArr[cntArr[index]].toLowerCase();
+            ban = new ora(`Searching ${wArr[cntArr[index]]}...`).start();
+            try{
+                let arr = (await mksec({word: wArr[cntArr[index]]})); 
+                let fys = fArr[cntArr[index]];
+                count++;
+                let sp = '';
+                for(let i = 0; i < 40-wArr[cntArr[index]].length; i++){
+                    sp += ' ';
+                }
+                ban.info('Found '+wArr[cntArr[index]] + sp + fys);
+            }catch(e){
+                ban.fail('Not found '+wArr[cntArr[index]]);
+            }
+        }
+
+
+        ban.succeed('Found '+wArr.length+' words, verified '+ count +' words.');
+        
+	})
 
 
 
