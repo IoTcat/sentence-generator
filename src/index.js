@@ -11,9 +11,8 @@ module.exports = async (params) => {
 
     const request = require('request');
 
-
     return new Promise((resolve, reject) => {
-        request(o_params.url+o_params.word, (err, res, body) => {
+        request('https://proxy.yimian.xyz/get/?url='+ Buffer.from(o_params.url+o_params.word, 'utf-8').toString('base64'), (err, res, body) => {
             if(err){
                 reject(err);
             }else{
